@@ -187,10 +187,10 @@ environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.DTS/value=0
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.LOCAL/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.LOCAL/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.LOCAL/value=1487024025
+environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.LOCAL/value=1488912109
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.UTC/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.UTC/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.UTC/value=1487020425
+environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.UTC/value=1488908509
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.ZONE/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.ZONE/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/A.EXTRA.TIME.ZONE/value=3600
@@ -454,7 +454,7 @@ environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.BOARD_NAME/value=NodeMCU 1.0 (ESP-12E Module)
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.COM_PORT/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.COM_PORT/operation=replace
-environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.COM_PORT/value=/dev/ttyUSB2
+environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.COM_PORT/value=/dev/ttyUSB0
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.CPU\ Frequency/delimiter=\:
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.CPU\ Frequency/operation=replace
 environment/project/it.baeyens.arduino.core.toolChain.release.2008232808/JANTJE.CPU\ Frequency/value=80 MHz
