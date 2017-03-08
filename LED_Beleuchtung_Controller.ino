@@ -86,7 +86,7 @@ void getIncomingPackets()
 	if (packetSize) {
 
 		/* Check for Multicast Message */
-		if (Udp.destinationIP() == broadcastIP)
+		if (Udp.destinationIP() != broadcastIP)
 		{
 			isLocal = 1;
 		}
@@ -115,6 +115,8 @@ void getIncomingPackets()
 	    Serial.print(remoteIp);
 	    Serial.print(", port ");
 	    Serial.println(Udp.remotePort());
+	    Serial.print("isLocal: ");
+	    Serial.println(isLocal);
 	    Serial.print("Data:  ");
 	    Serial.print(intBuffer[0]);
 	    Serial.print(intBuffer[1]);
@@ -139,25 +141,39 @@ void configure()
 	case SET_BRIGHTNESS_ID:
 		for (i=0; i<3; i++)
 			brightness[i] = data[i];
+			Serial.println("Set Brightness");
 		break;
 
 	case SEND_OWN_STATUS_ID:		/* STATUS REQUEST */
 		statusMessageUDP();
+		Serial.println("Send Status");
 		break;
 
 	case SWITCH_OFF_ID: 	/* OFF */
-		if (isLocal || data[0]==ROOM)
+		Serial.print("Switch off: ");
+		if (isLocal || data[0]==ROOM || data[0]==ALLROOMS)
 		{
 			for(i=0; i<3; i++)
 				brightness[i]=0;
+			Serial.println("successful");
+		}
+		else
+		{
+			Serial.println("failed");
 		}
 		break;
 
 	case SWITCH_ON_ID: 	/* ON */
+		Serial.print("Switch o: ");
 		if(isLocal || data[0]==ROOM || data[0]==ALLROOMS)
 		{
 			for(i=0; i<3; i++)
 				brightness[i]=default_brightness[i];
+			Serial.println("successful");
+		}
+		else
+		{
+			Serial.println("failed");
 		}
 		break;
 
@@ -173,7 +189,7 @@ void configure()
 	default:
 		break;
 	}
-	controlByte = 0;
+	controlByte = 0xFF;
 
 }
 
