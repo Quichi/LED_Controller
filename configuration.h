@@ -8,7 +8,7 @@
 #ifndef CONFIGURATION_H_
 #define CONFIGURATION_H_
 
-#define NODE_ID 5
+#define NODE_ID 2
 #define ROOM LIVINGROOM
 
 /* Communication Definitions */

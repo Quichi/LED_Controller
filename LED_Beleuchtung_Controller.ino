@@ -1,4 +1,4 @@
-#include "Arduino.h"
+	#include "Arduino.h"
 #include <SPI.h>
 #include <ESP8266WiFi.h>
 #include <WiFiUdp.h>
@@ -6,17 +6,8 @@
 #include "Ticker.h"
 #include "WiFi_Credentials.h"
 #include "config_adv.h"
+#include <EEPROM.h>
 
-char* ssid     = HOME_SSID;
-char* pass = HOME_PASS;
-
-int keyIndex = 0;            // your network key Index number (needed only for WEP)
-int status = WL_IDLE_STATUS;
-int loop_time = 0;
-int default_brightness[3] = {0,0,255};
-uint8_t isLocal = 0;
-
-IPAddress broadcastIP(255,255,255,255);
 
 uint8_t brightness[3];
 uint8_t data[3];
@@ -24,6 +15,17 @@ uint8_t controlByte;
 
 WiFiUDP Udp;
 Ticker ticker;
+
+char* ssid     = HOME_SSID;
+char* pass = HOME_PASS;
+
+int keyIndex = 0;            // your network key Index number (needed only for WEP)
+int status = WL_IDLE_STATUS;
+int loop_time = 0;
+uint8_t isLocal = 0;
+configuration *config;
+
+IPAddress broadcastIP(255,255,255,255);
 
 void incrementMilli()
 {
@@ -38,6 +40,8 @@ void setup()
 	{
 		data[i]=0;
 	}
+
+	getDefaultValues();
 
 	ticker.attach(.001, incrementMilli);
 
@@ -58,13 +62,13 @@ void loop()
 
 	while(1)
 	{
-		if(loop_time >= 1000)
+		if((loop_time >= 1000) && (config->status_messages==true))
 		{
 			loop_time = 0;
 			messageCount++;
 			Serial.println(messageCount);
 
-			statusMessageUDP();
+			//statusMessageUDP();
 		}
 		getIncomingPackets();
 		configure();
@@ -83,7 +87,7 @@ void getIncomingPackets()
 
 	packetSize = Udp.parsePacket();
 
-	if (packetSize) {
+	if (packetSize == 4) {
 
 		/* Check for Multicast Message */
 		if (Udp.destinationIP() != broadcastIP)
@@ -139,9 +143,14 @@ void configure()
 	switch(controlByte)
 	{
 	case SET_BRIGHTNESS_ID:
-		for (i=0; i<3; i++)
-			brightness[i] = data[i];
+		if(isLocal)
+		{
+			for (i=0; i<3; i++)
+			{
+				brightness[i] = data[i];
+			}
 			Serial.println("Set Brightness");
+		}
 		break;
 
 	case SEND_OWN_STATUS_ID:		/* STATUS REQUEST */
@@ -154,7 +163,9 @@ void configure()
 		if (isLocal || data[0]==ROOM || data[0]==ALLROOMS)
 		{
 			for(i=0; i<3; i++)
+			{
 				brightness[i]=0;
+			}
 			Serial.println("successful");
 		}
 		else
@@ -167,8 +178,10 @@ void configure()
 		Serial.print("Switch o: ");
 		if(isLocal || data[0]==ROOM || data[0]==ALLROOMS)
 		{
-			for(i=0; i<3; i++)
-				brightness[i]=default_brightness[i];
+			for(i=0; i<sizeof(config->default_rgb); i++)
+			{
+				brightness[i] = config->default_rgb[i];
+			}
 			Serial.println("successful");
 		}
 		else
@@ -178,18 +191,39 @@ void configure()
 		break;
 
 	case SET_DEFAULTS_ID:
-		//TODO
+		if(isLocal)
+		{
+			Serial.println("Save Default Values");
+			for (i=0; i<sizeof(config->default_rgb); i++)
+			{
+				config->default_rgb[i] = data[i];
+			}
+			setDefaultValues();
+		}
 		break;
 
 	case REQUEST_DEFAULTS_ID:
-		//TODO:
+		Serial.println("Sending Default Values");
+		getDefaultValues();
+		defaultsMessageUDP();
 		break;
 
+	case SET_STATUSMESSAGES_ID:
+		Serial.println("Send Status Messages: "+config->status_messages);
+		if((data[0]==0x01) && (data[1]==0x02) && (data[2]==0x03))
+		{
+			config->status_messages=true;
+		}
+		else
+		{
+			config->status_messages=false;
+		}
+		break;
 
 	default:
 		break;
 	}
-	controlByte = 0xFF;
+	controlByte = DO_NOTHING;
 
 }
 
@@ -234,17 +268,55 @@ void connectToWifi()
  */
 void statusMessageUDP()
 {	//TODO:
-	uint8_t statusMessage = 0;
+	uint8_t statusMessage[4];
 
-	statusMessage = 0xFF;
+	statusMessage[0] = STATUS_ID;
 	for(int i=0; i<3; i++)
 	{
-		statusMessage = statusMessage<<8;
-		statusMessage |= brightness[i];
+		statusMessage[i+1] = brightness[i];
 	}
 
 	Udp.beginPacket(broadcastIP, Udp.remotePort());
-	Udp.write(statusMessage);
+	Udp.write(statusMessage,sizeof(statusMessage));
 	Udp.endPacket();
+}
+void defaultsMessageUDP()
+{
+	uint8_t defaultsMessage[4];
+
+	defaultsMessage[0] = RESPONSE_DEFAULTS_ID;
+	for(uint8_t i=0; i<sizeof(config->default_rgb); i++)
+	{
+		defaultsMessage[i+1]= config->default_rgb[i];
+	}
+
+	Udp.beginPacket(broadcastIP, Udp.remotePort());
+	Udp.write(defaultsMessage,sizeof(defaultsMessage));
+	Udp.endPacket();
+}
+
+void setDefaultValues()
+{
+	EEPROM.begin(sizeof(configuration));
+
+	for(uint8_t i=0; i<sizeof(config); i++)
+	{
+		EEPROM.write(CONFIGURATION_ADDR+i, *((char*)&config+i));
+	}
+
+	EEPROM.commit();
+	EEPROM.end();
+}
+
+void getDefaultValues()
+{
+	EEPROM.begin(sizeof(configuration));
+
+	for(uint8_t i=0; i<sizeof(config); i++)
+	{
+		*((char*)config+i) = EEPROM.read(CONFIGURATION_ADDR+i);
+	}
+
+	EEPROM.end();
 }
 

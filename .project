@@ -42,6 +42,11 @@
 			<location>/opt/eclipse/cdt-neon/arduinoPlugin/packages/esp8266/hardware/esp8266/2.3.0/variants/nodemcu</location>
 		</link>
 		<link>
+			<name>libraries/EEPROM</name>
+			<type>2</type>
+			<location>/opt/eclipse/cdt-neon/arduinoPlugin/packages/esp8266/hardware/esp8266/2.3.0/libraries/EEPROM</location>
+		</link>
+		<link>
 			<name>libraries/ESP8266WiFi</name>
 			<type>2</type>
 			<location>/opt/eclipse/cdt-neon/arduinoPlugin/packages/esp8266/hardware/esp8266/2.3.0/libraries/ESP8266WiFi</location>
